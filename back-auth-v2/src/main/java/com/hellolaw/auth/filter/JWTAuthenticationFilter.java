@@ -41,7 +41,6 @@ public class JWTAuthenticationFilter implements WebFilter {
 							.contextWrite(
 								ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext))));
 				} else {
-					log.info("여기입니다.");
 					return validateRefreshTokenAndReIssueAccessToken(exchange, accessToken, chain);
 				}
 			})

@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	private final UserRepository userRepository;
-	private final JWTProvider jwtProvider;
 	private final RedisService redisService;
 
 	@Override

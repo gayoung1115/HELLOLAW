@@ -68,7 +68,6 @@ public class CustomOAuth2SuccessHandler extends RedirectServerAuthenticationSucc
 	}
 
 	public Mono<Void> handleTokens(ServerHttpResponse response, String accessToken, String nickname) {
-		// 로그 출력
 		log.info("accessToken = {}", accessToken);
 
 		ResponseCookie accessTokenCookie = ResponseCookie.from("access-token", accessToken)
@@ -77,7 +76,6 @@ public class CustomOAuth2SuccessHandler extends RedirectServerAuthenticationSucc
 			.httpOnly(true)
 			.build();
 
-		// 새로운 refreshToken 생성
 		ResponseCookie nicknameCookie = ResponseCookie.from("nickname", Base64.getUrlEncoder().encodeToString(
 				nickname.getBytes(StandardCharsets.UTF_8)))
 			.maxAge(Duration.ofDays(30)) // 예시로 30일 유지
@@ -85,24 +83,19 @@ public class CustomOAuth2SuccessHandler extends RedirectServerAuthenticationSucc
 			.path("/")
 			.build();
 
-		// response에 refreshToken 쿠키 추가
 		response.addCookie(accessTokenCookie);
 		response.addCookie(nicknameCookie);
 
-		// 리프레시 토큰 레디스에 저장 (비동기로 실행됨)
 		return Mono.fromRunnable(() -> {
 				log.info("hi");
-				// refreshTokenRepository.save(new RefreshToken(refreshToken));
 			}).subscribeOn(Schedulers.boundedElastic())
 			.then(Mono.defer(() -> {
-				// 리다이렉트할 URL 생성
 				String targetUrl = UriComponentsBuilder.fromUriString(
 						OAuthRedirectURL)
 					.build()
 					.encode(StandardCharsets.UTF_8)
 					.toUriString();
 
-				// 리다이렉트
 				response.getHeaders().set(HttpHeaders.LOCATION, targetUrl);
 				response.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 				response.setStatusCode(HttpStatus.FOUND);
@@ -113,7 +106,6 @@ public class CustomOAuth2SuccessHandler extends RedirectServerAuthenticationSucc
 	public Mono<GeneratedToken> generateTokenByEmail(OAuth2UserInfo oAuth2UserInfo) {
 		return getUserIdByEmail(oAuth2UserInfo)
 			.flatMap(user -> {
-				// userId를 이용하여 토큰을 생성하고 Mono<GeneratedToken>을 반환
 				return Mono.just(jwtProvider.generatedToken(user.getId(), oAuth2UserInfo.provider()));
 			});
 	}

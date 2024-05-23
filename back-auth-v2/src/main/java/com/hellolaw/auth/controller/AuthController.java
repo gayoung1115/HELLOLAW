@@ -26,16 +26,13 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AuthController {
 
-	// private final AuthService authService;
 	private final UserService userService;
-	// private final AuthProviderFinder authProviderFinder;
 
 	@Value("${auth.controller.redirect-url}")
 	private String OAuthRedirectURL;
 
 	@GetMapping("/logout")
-	Mono<ResponseEntity<ApiResponse<Void>>> logout(Authentication authentication, ServerWebExchange exchange) throws
-		IOException {
+	Mono<ResponseEntity<ApiResponse<Void>>> logout(Authentication authentication, ServerWebExchange exchange) {
 
 		ResponseCookie cookie = ResponseCookie.from("access-token", null)
 			.path("/")
@@ -53,10 +50,4 @@ public class AuthController {
 
 		return Mono.just(ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success()));
 	}
-
-	// @GetMapping("/authentication")
-	// Long authentication(Authentication authentication) {
-	// 	CustomPrincipal principal = (CustomPrincipal)authentication.getPrincipal();
-	// 	return principal.getId();
-	// }
 }
